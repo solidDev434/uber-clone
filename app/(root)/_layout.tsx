@@ -1,14 +1,5 @@
-import React, { Component } from "react";
-import { Text, View } from "react-native";
+import React from "react";
 
-export class _layout extends Component {
-  render() {
-    return (
-      <View>
-        <Text>_layout</Text>
-      </View>
-    );
-  }
+export default function _layout() {
+  return <div>_layout</div>;
 }
-
-export default _layout;
