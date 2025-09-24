@@ -2,17 +2,47 @@ import CustomButton from "@/components/CustomButton";
 import InputField from "@/components/InputField";
 import OAuth from "@/components/OAuth";
 import { icons, images } from "@/constants";
-import { Link } from "expo-router";
-import React from "react";
-import { Image, ScrollView, Text, View } from "react-native";
+import { useSignIn } from "@clerk/clerk-expo";
+import { Link, useRouter } from "expo-router";
+import React, { useCallback } from "react";
+import { Alert, Image, ScrollView, Text, View } from "react-native";
 
 const SignIn = () => {
+  const router = useRouter();
   const [form, setForm] = React.useState({
     email: "",
     password: "",
   });
+  const [isLoading, setIsLoading] = React.useState(false);
+  const { signIn, setActive, isLoaded } = useSignIn();
 
-  const onSignInPress = async () => {};
+  const onSignInPress = useCallback(async () => {
+    if (!isLoaded) return;
+
+    setIsLoading(true);
+
+    try {
+      const signInAttempt = await signIn.create({
+        identifier: form.email,
+        password: form.password,
+      });
+
+      if (signInAttempt.status === "complete") {
+        await setActive({
+          session: signInAttempt.createdSessionId,
+          navigate: ({ session }) => {
+            router.replace("/(root)/(tabs)/home");
+          },
+        });
+      } else {
+        console.error(JSON.stringify(signInAttempt, null, 2));
+      }
+    } catch (err: any) {
+      Alert.alert("Error", err.errors[0].longMessage);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [isLoaded, form.email, form.password, setActive, signIn, router]);
 
   return (
     <ScrollView className="flex-1 bg-white">
@@ -45,6 +75,7 @@ const SignIn = () => {
           <CustomButton
             title="Sign In"
             onPress={onSignInPress}
+            isLoading={isLoading}
             className="mt-6"
           />
 

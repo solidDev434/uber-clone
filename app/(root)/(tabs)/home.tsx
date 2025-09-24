@@ -1,27 +1,33 @@
-import { SignedIn, SignedOut, useUser } from "@clerk/clerk-expo";
-import { Link } from "expo-router";
+import CustomButton from "@/components/CustomButton";
+import { useAuth, useUser } from "@clerk/clerk-expo";
+import { useRouter } from "expo-router";
 import React from "react";
-import { Text } from "react-native";
+import { Alert, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const Home = () => {
+  const router = useRouter();
   const { user } = useUser();
+  const { signOut } = useAuth();
+
+  const logout = async () => {
+    try {
+      await signOut();
+      router.replace("/(auth)/sign-in");
+    } catch (err) {
+      Alert.alert(JSON.stringify(err, null, 2));
+    }
+  };
 
   return (
     <SafeAreaView>
-      <SignedIn>
-        <Text>Hello {user?.emailAddresses[0].emailAddress}</Text>
-      </SignedIn>
-
-      <SignedOut>
-        <Link href="/(auth)/sign-in">
-          <Text>Sign in</Text>
-        </Link>
-
-        <Link href="/(auth)/sign-up">
-          <Text>Sign up</Text>
-        </Link>
-      </SignedOut>
+      <Text>Hello {user?.emailAddresses[0].emailAddress}</Text>
+      <CustomButton
+        title="Logout"
+        bgVariant="outline"
+        textVariant="primary"
+        onPress={logout}
+      />
     </SafeAreaView>
   );
 };

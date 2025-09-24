@@ -16,7 +16,7 @@
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/favicon.png",
+      "favicon": "./assets/images/splash.png",
       "bundler": "metro"
     },
     "plugins": [

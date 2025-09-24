@@ -1,14 +1,16 @@
-import CustomButton from "@/components/CustomButton";
-import InputField from "@/components/InputField";
-import OAuth from "@/components/OAuth";
-import { icons, images } from "@/constants";
 import { useSignUp } from "@clerk/clerk-expo";
-import { Link, router } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import React from "react";
 import { Alert, Image, ScrollView, Text, View } from "react-native";
 import { ReactNativeModal } from "react-native-modal";
 
+import CustomButton from "@/components/CustomButton";
+import InputField from "@/components/InputField";
+import OAuth from "@/components/OAuth";
+import { icons, images } from "@/constants";
+
 const SignUp = () => {
+  const router = useRouter();
   const { isLoaded, signUp, setActive } = useSignUp();
   const [isLoading, setIsLoading] = React.useState(false);
   const [isVerifying, setIsVerifying] = React.useState(false);
@@ -76,6 +78,8 @@ const SignUp = () => {
           ...verification,
           state: "succcess",
         });
+
+        setShowSuccessModal(true);
       } else {
         setVerification({
           ...verification,
@@ -94,8 +98,7 @@ const SignUp = () => {
       setIsVerifying(false);
     }
   };
-
-  console.log(verification, "verification");
+  console.log(showSuccessModal);
 
   return (
     <ScrollView className="flex-1 bg-white">
@@ -151,12 +154,7 @@ const SignUp = () => {
           </Link>
 
           {/* Verify Mail Modal */}
-          <ReactNativeModal
-            isVisible={verification.state === "pending"}
-            onModalHide={() => {
-              if (verification.state === "success") setShowSuccessModal(true);
-            }}
-          >
+          <ReactNativeModal isVisible={verification.state === "pending"}>
             <View className="bg-white px-7 py-9 rounded-2xl min-h-[300px]">
               <Text className="text-3xl font-JakartaExtraBold mb-2">
                 Verification
