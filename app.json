@@ -15,7 +15,7 @@
       "edgeToEdgeEnabled": true
     },
     "web": {
-      "output": "static",
+      "output": "server",
       "favicon": "./assets/images/splash.png",
       "bundler": "metro"
     },

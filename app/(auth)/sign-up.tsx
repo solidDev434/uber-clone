@@ -8,6 +8,7 @@ import CustomButton from "@/components/CustomButton";
 import InputField from "@/components/InputField";
 import OAuth from "@/components/OAuth";
 import { icons, images } from "@/constants";
+import { fetchAPI } from "@/lib/fetch";
 
 const SignUp = () => {
   const router = useRouter();
@@ -45,15 +46,14 @@ const SignUp = () => {
         firstName: form.name,
       });
 
-      // Send email verification code to user
-      await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
+      await signUp.prepareEmailAddressVerification({
+        strategy: "email_code",
+      });
 
       setVerification({
         ...verification,
         state: "pending",
       });
-
-      resetForm();
     } catch (err: any) {
       Alert.alert("Error", err.errors[0].longMessage);
     } finally {
@@ -72,12 +72,23 @@ const SignUp = () => {
 
       if (signUpAttempt.status === "complete") {
         // TODO: Create a database user!
+        await fetchAPI(`/api/user`, {
+          method: "POST",
+          body: JSON.stringify({
+            name: form.name,
+            email: form.email,
+            clerkId: signUpAttempt.createdUserId,
+          }),
+        });
 
         await setActive({ session: signUpAttempt.createdSessionId });
         setVerification({
           ...verification,
           state: "succcess",
         });
+
+        // Reset form data
+        resetForm();
 
         setShowSuccessModal(true);
       } else {
@@ -93,12 +104,11 @@ const SignUp = () => {
         state: "failed",
         error: err.errors[0].longMessage,
       });
-      console.log(JSON.stringify(err, null, 2));
+      console.log(JSON.stringify(err, null, 2), err?.message);
     } finally {
       setIsVerifying(false);
     }
   };
-  console.log(showSuccessModal);
 
   return (
     <ScrollView className="flex-1 bg-white">
